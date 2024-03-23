@@ -1,3 +1,8 @@
+import ru.yandex.javacource.tsvetkov.javacanban.manager.Status;
+import ru.yandex.javacource.tsvetkov.javacanban.manager.TaskManager;
+import ru.yandex.javacource.tsvetkov.javacanban.task.Epic;
+import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
+import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
 public class Main {
 
@@ -11,31 +16,35 @@ public class Main {
         Task eatAnApple = new Task("Съесть яблоко", "Съесть нужно целиком");
 
         Epic coockLunch = new Epic("Приготовить обед", "Должно быть вкусно");
-        Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", coockLunch.getId());
-        Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", coockLunch.getId());
+
+        int epicId = taskManager.addNewEpic(coockLunch);
+
+        Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", epicId);
+        Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", epicId);
 
         Epic loseWeight = new Epic("Похудеть", "Нужно похудеть на 10 кг");
-        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", loseWeight.getId());
 
-        taskManager.createTask(runFiveRings);
-        taskManager.createTask(eatAnApple);
-        taskManager.createTask(coockLunch);
-        taskManager.createTask(coockFirstDish);
-        taskManager.createTask(coocSecondDish);
-        taskManager.createTask(loseWeight);
-        taskManager.createTask(eatLess);
+        epicId = taskManager.addNewEpic(loseWeight);
 
-        System.out.println(taskManager.getTaskList());
-        System.out.println(taskManager.getEpicList());
-        System.out.println(taskManager.getSubTaskList());
+        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId);
 
-        runFiveRings = taskManager.getTaskById(runFiveRings.getId());
-        eatAnApple = taskManager.getTaskById(eatAnApple.getId());
-        coockLunch = taskManager.getEpicById(coockLunch.getId());
-        coockFirstDish = taskManager.getSubtaskById(coockFirstDish.getId());
-        coocSecondDish = taskManager.getSubtaskById(coocSecondDish.getId());
-        loseWeight = taskManager.getEpicById(loseWeight.getId());
-        eatLess = taskManager.getSubtaskById(eatLess.getId());
+        taskManager.addNewTask(runFiveRings);
+        taskManager.addNewTask(eatAnApple);
+        taskManager.addNewSubtask(coockFirstDish);
+        taskManager.addNewSubtask(coocSecondDish);
+        taskManager.addNewSubtask(eatLess);
+
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubTasks());
+
+        runFiveRings = taskManager.getTask(runFiveRings.getId());
+        eatAnApple = taskManager.getTask(eatAnApple.getId());
+        coockLunch = taskManager.getEpic(coockLunch.getId());
+        coockFirstDish = taskManager.getSubTask(coockFirstDish.getId());
+        coocSecondDish = taskManager.getSubTask(coocSecondDish.getId());
+        loseWeight = taskManager.getEpic(loseWeight.getId());
+        eatLess = taskManager.getSubTask(eatLess.getId());
 
 
         runFiveRings.setStatus(Status.DONE);
@@ -46,31 +55,33 @@ public class Main {
 
         eatLess.setStatus(Status.DONE);
 
+        loseWeight.setName("Новое имя");
+
         taskManager.updateTask(runFiveRings);
         taskManager.updateTask(eatAnApple);
-        taskManager.updateTask(coockLunch);
-        taskManager.updateTask(coockFirstDish);
-        taskManager.updateTask(coocSecondDish);
-        taskManager.updateTask(loseWeight);
-        taskManager.updateTask(eatLess);
+        taskManager.updateEpic(coockLunch);
+        taskManager.updateSubtask(coockFirstDish);
+        taskManager.updateSubtask(coocSecondDish);
+        taskManager.updateEpic(loseWeight);
+        taskManager.updateSubtask(eatLess);
 
         System.out.println();
-        System.out.println(taskManager.getTaskById(runFiveRings.getId()));
-        System.out.println(taskManager.getTaskById(eatAnApple.getId()));
-        System.out.println(taskManager.getEpicById(coockLunch.getId()));
-        System.out.println(taskManager.getSubtaskById(coockFirstDish.getId()));
-        System.out.println(taskManager.getSubtaskById(coocSecondDish.getId()));
-        System.out.println(taskManager.getEpicById(loseWeight.getId()));
-        System.out.println(taskManager.getSubtaskById(eatLess.getId()));
+        System.out.println(taskManager.getTask(runFiveRings.getId()));
+        System.out.println(taskManager.getTask(eatAnApple.getId()));
+        System.out.println(taskManager.getEpic(coockLunch.getId()));
+        System.out.println(taskManager.getSubTask(coockFirstDish.getId()));
+        System.out.println(taskManager.getSubTask(coocSecondDish.getId()));
+        System.out.println(taskManager.getEpic(loseWeight.getId()));
+        System.out.println(taskManager.getSubTask(eatLess.getId()));
 
-        taskManager.removeTaskById(runFiveRings.getId());
-        taskManager.removeTaskById(coockFirstDish.getId());
-        taskManager.removeTaskById(loseWeight.getId());
+        taskManager.removeTask(runFiveRings.getId());
+        taskManager.removeSubtask(coockFirstDish.getId());
+        taskManager.removeEpic(loseWeight.getId());
 
         System.out.println();
-        System.out.println(taskManager.getTaskList());
-        System.out.println(taskManager.getEpicList());
-        System.out.println(taskManager.getSubTaskList());
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubTasks());
 
     }
 

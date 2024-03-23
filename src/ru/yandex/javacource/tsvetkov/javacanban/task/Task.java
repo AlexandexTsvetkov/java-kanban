@@ -1,9 +1,11 @@
+package ru.yandex.javacource.tsvetkov.javacanban.task;
+import ru.yandex.javacource.tsvetkov.javacanban.manager.Status;
 
 public class Task {
     protected int id;
     protected String name;
     protected String description;
-    protected Status status;
+    public Status status;
 
     @Override
     public boolean equals(Object o) {
@@ -33,19 +35,17 @@ public class Task {
 
     public Task(String name, String description) {
 
-        TaskManager.updateIdCounter();
-        this.id = TaskManager.idCounter;
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
     }
 
-    protected Task(String name, String description, Status status, int id) {
+    public String getName() {
+        return name;
+    }
 
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
+    public String getDescription() {
+        return description;
     }
 
     public int getId() {
@@ -56,17 +56,17 @@ public class Task {
         return status;
     }
 
-    public static Task copyOf(Task task) {
-        return new Task(task.name, task.description, task.status, task.id);
-    }
-
     @Override
     public String toString() {
-        return "Task{" +
+        return "ru.yandex.javacource.tsvetkov.javacanban.task.Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

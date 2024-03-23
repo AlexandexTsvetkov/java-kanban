@@ -1,10 +1,7 @@
-public class Subtask extends Task {
-    private final int epicId;
+package ru.yandex.javacource.tsvetkov.javacanban.task;
 
-    public Subtask(String name, String description, Status status, int id, int epicId) {
-        super(name, description, status, id);
-        this.epicId = epicId;
-    }
+public class Subtask extends Task {
+    private int epicId;
 
     public Subtask(String name, String description, int epicId) {
         super(name, description);
@@ -15,13 +12,9 @@ public class Subtask extends Task {
         return epicId;
     }
 
-    public static Subtask copyOf(Subtask subTask) {
-        return new Subtask(subTask.name, subTask.description, subTask.status, subTask.id, subTask.epicId);
-    }
-
     @Override
     public String toString() {
-        return "Subtask{" +
+        return "ru.yandex.javacource.tsvetkov.javacanban.task.Subtask{" +
                 "epicId=" + epicId +
                 ", id=" + id +
                 ", name='" + name + '\'' +
