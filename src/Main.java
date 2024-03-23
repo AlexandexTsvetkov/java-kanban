@@ -46,6 +46,13 @@ public class Main {
         loseWeight = taskManager.getEpic(loseWeight.getId());
         eatLess = taskManager.getSubTask(eatLess.getId());
 
+        runFiveRings = new Task(runFiveRings.getName(), runFiveRings.getDescription(), runFiveRings.getId());
+        eatAnApple = new Task(eatAnApple.getName(), eatAnApple.getDescription(), eatAnApple.getId());
+        coockLunch = new Epic(coockLunch.getName(), coockLunch.getDescription(), coockLunch.getId(), coockLunch.getSubtasksId());
+        coockFirstDish = new Subtask(coockFirstDish.getName(), coockFirstDish.getDescription(), coockFirstDish.getId(), coockFirstDish.getEpicId());
+        coocSecondDish = new Subtask(coocSecondDish.getName(), coocSecondDish.getDescription(), coocSecondDish.getId(), coocSecondDish.getEpicId());
+        loseWeight = new Epic(loseWeight.getName(), loseWeight.getDescription(), loseWeight.getId(), loseWeight.getSubtasksId());
+        eatLess = new Subtask(eatLess.getName(), eatLess.getDescription(), eatLess.getId(), eatLess.getEpicId());
 
         runFiveRings.setStatus(Status.DONE);
         eatAnApple.setStatus(Status.IN_PROGRESS);
