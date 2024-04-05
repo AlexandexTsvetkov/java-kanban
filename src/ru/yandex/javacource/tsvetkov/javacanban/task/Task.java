@@ -1,5 +1,4 @@
 package ru.yandex.javacource.tsvetkov.javacanban.task;
-import ru.yandex.javacource.tsvetkov.javacanban.manager.Status;
 
 public class Task {
     protected int id;
@@ -40,12 +39,12 @@ public class Task {
         this.status = Status.NEW;
     }
 
-    public Task(String name, String description, int id) {
+    public Task(String name, String description, int id, Status status) {
 
         this.id = id;
         this.name = name;
         this.description = description;
-        this.status = Status.NEW;
+        this.status = status;
     }
 
     public String getName() {

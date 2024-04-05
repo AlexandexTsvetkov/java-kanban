@@ -1,4 +1,4 @@
-package ru.yandex.javacource.tsvetkov.javacanban.manager;
+package ru.yandex.javacource.tsvetkov.javacanban.task;
 
 public enum Status {
     NEW,
