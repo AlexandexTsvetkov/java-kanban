@@ -4,7 +4,6 @@ import ru.yandex.javacource.tsvetkov.javacanban.task.Epic;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
@@ -28,13 +27,13 @@ public interface TaskManager {
 
     void updateEpic(Epic epic);
 
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
-    ArrayList<Subtask> getSubTasks();
+    List<Subtask> getSubTasks();
 
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
 
-    ArrayList<Subtask> getSubTasksOfEpic(int epicId);
+    List<Subtask> getSubTasksOfEpic(int epicId);
 
     void removeTasks();
 

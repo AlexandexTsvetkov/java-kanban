@@ -3,27 +3,34 @@ package ru.yandex.javacource.tsvetkov.javacanban.manager;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    ArrayList<Task> history;
+    private static final int HISTORY_SIZE = 10;
+
+    private final List<Task> history;
+
 
     public InMemoryHistoryManager() {
         this.history = new ArrayList<>();
     }
 
     @Override
-    public <T extends Task> T add(T task) {
+    public void add(Task task) {
 
-        if (history.size() == 10) {
+        if (task == null) {
+            return;
+        }
+
+        if (history.size() == HISTORY_SIZE) {
             history.removeFirst();
         }
         history.add(task);
-        return task;
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
+    public List<Task> getHistory() {
         return history;
     }
 

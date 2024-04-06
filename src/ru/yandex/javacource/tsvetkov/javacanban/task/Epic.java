@@ -1,14 +1,15 @@
 package ru.yandex.javacource.tsvetkov.javacanban.task;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private ArrayList<Integer> subtasksId;
+    private List<Integer> subtasksId;
 
     public void removeSubtasks() {
         subtasksId.clear();
     }
 
-    public ArrayList<Integer> getSubtasksId() {
+    public List<Integer> getSubtasksId() {
         return new ArrayList<>(subtasksId);
     }
 
@@ -17,7 +18,7 @@ public class Epic extends Task {
         this.subtasksId = new ArrayList<>();
     }
 
-    public Epic(String name, String description, int id, ArrayList<Integer> subtasksId) {
+    public Epic(String name, String description, int id, List<Integer> subtasksId) {
         super(name, description, id, Status.NEW);
         this.subtasksId = subtasksId;
     }
@@ -59,5 +60,9 @@ public class Epic extends Task {
                 ", description='" + description + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public void setSubtasksId(List<Integer> subtasksId) {
+        this.subtasksId = subtasksId;
     }
 }

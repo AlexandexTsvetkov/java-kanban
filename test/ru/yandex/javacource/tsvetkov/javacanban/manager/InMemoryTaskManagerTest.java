@@ -1,12 +1,12 @@
 package ru.yandex.javacource.tsvetkov.javacanban.manager;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Epic;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Status;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,13 +19,9 @@ class InMemoryTaskManagerTest {
     static Subtask subtask1;
     static Task task1;
 
-    @BeforeAll
-    static void beforeAll() {
-        taskManager = Managers.getDefault();
-    }
-
     @BeforeEach
     void BeforeEach() {
+        taskManager = Managers.getDefault();
 
         taskManager.removeEpics();
         taskManager.removeTasks();
@@ -117,15 +113,15 @@ class InMemoryTaskManagerTest {
 
     @Test
     void historymanagerSavesPreviousVersionOfTask() {
-
         Task historyTask = taskManager.getTask(task1.getId());
+
+        Task newTask = new Task("New name", "New description", task1.getId(), Status.DONE);
+        taskManager.updateTask(newTask);
 
         String name = historyTask.getName();
         String description = historyTask.getDescription();
         Status status = historyTask.getStatus();
 
-        Task newTask = new Task("New name", "New description", task1.getId(), Status.DONE);
-        taskManager.updateTask(newTask);
         assertNotEquals(name, taskManager.getTask(task1.getId()).getName());
         assertNotEquals(description, taskManager.getTask(task1.getId()).getDescription());
         assertNotEquals(status, taskManager.getTask(task1.getId()).getStatus());
@@ -133,15 +129,15 @@ class InMemoryTaskManagerTest {
 
     @Test
     void historymanagerSavesPreviousVersionOfSubtask() {
-
         Subtask historySubtask = taskManager.getSubTask(subtask1.getId());
+
+        Subtask newSubtask = new Subtask("New name", "New description", subtask1.getId(), Status.DONE, epic1.getId());
+        taskManager.updateSubtask(newSubtask);
 
         String name = historySubtask.getName();
         String description = historySubtask.getDescription();
         Status status = historySubtask.getStatus();
 
-        Subtask newSubtask = new Subtask("New name", "New description", subtask1.getId(), Status.DONE, epic1.getId());
-        taskManager.updateSubtask(newSubtask);
         assertNotEquals(name, taskManager.getSubTask(subtask1.getId()).getName(), "Старая версия имени");
         assertNotEquals(description, taskManager.getSubTask(subtask1.getId()).getDescription(), "Старая версия описания");
         assertNotEquals(status, taskManager.getSubTask(subtask1.getId()).getStatus(), "Старая версия статуса");
@@ -152,20 +148,20 @@ class InMemoryTaskManagerTest {
 
         Epic historyEpic = taskManager.getEpic(epic1.getId());
 
-        String name = historyEpic.getName();
-        String description = historyEpic.getDescription();
-        Status status = historyEpic.getStatus();
-        ArrayList<Integer> subtasksId = historyEpic.getSubtasksId();
+        Epic newEpic = new Epic("New name", "New description", epic1.getId(), taskManager.getEpic(epic1.getId()).getSubtasksId());
+        taskManager.updateEpic(newEpic);
 
         Subtask newSubtask = new Subtask("Some name", "Some description", epic1.getId());
 
         taskManager.addNewSubtask(newSubtask);
 
-        Epic newEpic = new Epic("New name", "New description", epic1.getId(), taskManager.getEpic(epic1.getId()).getSubtasksId());
-        taskManager.updateEpic(newEpic);
-
         Subtask updatedSubtask = new Subtask("Some name", "Some description", newSubtask.getId(), Status.DONE, epic1.getId());
         taskManager.updateSubtask(updatedSubtask);
+
+        String name = historyEpic.getName();
+        String description = historyEpic.getDescription();
+        Status status = historyEpic.getStatus();
+        List<Integer> subtasksId = historyEpic.getSubtasksId();
 
         assertNotEquals(name, taskManager.getEpic(epic1.getId()).getName(), "Старая версия имени");
         assertNotEquals(description, taskManager.getEpic(epic1.getId()).getDescription(), "Старая версия описания");

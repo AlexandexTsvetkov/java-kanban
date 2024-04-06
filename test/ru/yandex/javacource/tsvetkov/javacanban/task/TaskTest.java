@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
-
     @Test
     void tasksAreEqualWhenIdsAreEqual() {
         Task task1 = new Task("Test1", "Test1", 1, Status.NEW);
