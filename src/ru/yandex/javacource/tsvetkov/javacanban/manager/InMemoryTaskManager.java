@@ -219,8 +219,7 @@ public class InMemoryTaskManager implements TaskManager {
         return epic;
     }
 
-    @Override
-    public void updateEpicStatus(int epicId) {
+    private void updateEpicStatus(int epicId) {
 
         Epic epic = epics.get(epicId);
 
