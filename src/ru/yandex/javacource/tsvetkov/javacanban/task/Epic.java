@@ -1,4 +1,5 @@
 package ru.yandex.javacource.tsvetkov.javacanban.task;
+
 import java.util.ArrayList;
 import java.util.List;
 

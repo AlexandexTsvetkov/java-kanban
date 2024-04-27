@@ -5,11 +5,9 @@ public final class Managers {
     private static TaskManager taskManager;
     private static HistoryManager historyManager;
 
-    private Managers() {}
-
     public static TaskManager getDefault() {
 
-        if(taskManager == null) {
+        if (taskManager == null) {
             taskManager = new InMemoryTaskManager();
         }
         return taskManager;
@@ -17,7 +15,7 @@ public final class Managers {
 
     public static HistoryManager getDefaultHistory() {
 
-        if(historyManager == null) {
+        if (historyManager == null) {
             historyManager = new InMemoryHistoryManager();
         }
         return historyManager;

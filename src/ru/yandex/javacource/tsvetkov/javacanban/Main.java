@@ -23,24 +23,42 @@ public class Main {
 
         Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", epicId);
         Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", epicId);
+        Subtask coockTea = new Subtask("Приготовить чай", "Желательно горячий", epicId);
 
         Epic loseWeight = new Epic("Похудеть", "Нужно похудеть на 10 кг");
 
-        epicId = taskManager.addNewEpic(loseWeight);
-
-        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId);
+        taskManager.addNewEpic(loseWeight);
 
         taskManager.addNewTask(runFiveRings);
         taskManager.addNewTask(eatAnApple);
         taskManager.addNewSubtask(coockFirstDish);
         taskManager.addNewSubtask(coocSecondDish);
-        taskManager.addNewSubtask(eatLess);
+        taskManager.addNewSubtask(coockTea);
 
         taskManager.getTask(3);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
+        taskManager.getSubTask(5);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
         taskManager.getEpic(1);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
         taskManager.getSubTask(7);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
+        taskManager.getEpic(1);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
+        taskManager.getTask(3);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
+        taskManager.removeTask(3);
+        System.out.println(taskManager.getHistory());
+        taskManager.removeEpic(1);
+        System.out.println(taskManager.getHistory());
+        System.out.println("/////////////////////////////");
 
-        printAllTasks(taskManager);
     }
 
     private static void printAllTasks(TaskManager manager) {
