@@ -233,6 +233,35 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void removeHistoryOfTasksAndEpics() {
+        taskManager.getTask(task1.getId());
+        taskManager.getEpic(epic1.getId());
+        taskManager.getSubTask(subtask1.getId());
+        assertEquals(3, taskManager.getHistory().size(), "Задачи не добавлены");
+        taskManager.removeTasks();
+        assertEquals(2, taskManager.getHistory().size(), "Таски не удалены");
+        taskManager.removeEpics();
+        assertEquals(0, taskManager.getHistory().size(), "Эпики удалены некорректно");
+
+    }
+
+    @Test
+    void removeHistoryOfSubtasks() {
+        taskManager.getSubTask(subtask1.getId());
+        assertEquals(1, taskManager.getHistory().size(), "Подзадачи не добавлены");
+        taskManager.removeSubTasks();
+        assertEquals(0, taskManager.getHistory().size(), "Подзадачи удалены некорректно");
+    }
+
+    @Test
+    void removeIdOfSubtask() {
+        int id = subtask1.getId();
+        assertTrue(epic1.getSubtasksId().contains(id), "Id добавлен");
+        taskManager.removeSubtask(id);
+        assertFalse(epic1.getSubtasksId().contains(id), "Id не удален");
+    }
+
+    @Test
     void removeEpics() {
         taskManager.removeEpics();
         assertEquals(0, taskManager.getEpics().size(), "Эпики не удалены");
@@ -247,7 +276,6 @@ class InMemoryTaskManagerTest {
 
     @Test
     void updateEpicStatus() {
-
         Epic epic = new Epic("Test addNewTask", "Test addNewTask description");
         final int epicId = taskManager.addNewEpic(epic);
 
@@ -275,5 +303,12 @@ class InMemoryTaskManagerTest {
     void getSubtasksOfEpic() {
         Subtask[] subtasks = {subtask1};
         assertArrayEquals(subtasks, taskManager.getSubTasksOfEpic(epic1.getId()).toArray(), "Сабтаски эпика не совпадают");
+    }
+
+    @Test
+    void changeId() {
+        task1.setId(task1.getId() + 1);
+        //пока не придумал решение для этой проблемы, не перемещая задачу в другой пакет
+        assertNotEquals(task1, taskManager.getTask(task1.getId()), "Изменение id привело к неправильной работе");
     }
 }
