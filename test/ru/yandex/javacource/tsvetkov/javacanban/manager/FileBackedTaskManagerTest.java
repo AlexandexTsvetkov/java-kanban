@@ -7,21 +7,34 @@ import ru.yandex.javacource.tsvetkov.javacanban.task.Status;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest {
+class FileBackedTaskManagerTest {
 
     static TaskManager taskManager;
     static Epic epic1;
     static Subtask subtask1;
     static Task task1;
+    static File emptyFile = new File("EmptyFile.txt");
+    static File tempFile;
+
+    static {
+        try {
+            tempFile = File.createTempFile("tempFile1", ".txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @BeforeEach
     void BeforeEach() {
-        taskManager = Managers.getDefault();
+        taskManager = FileBackedTaskManager.loadFromFile(tempFile);
 
         taskManager.removeEpics();
         taskManager.removeTasks();
@@ -33,22 +46,6 @@ class InMemoryTaskManagerTest {
 
         taskManager.addNewSubtask(subtask1);
         taskManager.addNewTask(task1);
-    }
-
-    @Test
-    void epicCantBeSubtask() {
-//        Epic epic1 = new Epic("Test1", "Test1");
-//
-//        taskManager.addNewEpic(epic1);
-//        taskManager.addNewSubtask(epic1);
-    }
-
-    @Test
-    void subtaskCantBeEpic() {
-//        Subtask subtask = new Subtask("Test1", "Test1");
-
-//        taskManager.addNewEpic(subtask);
-//        taskManager.addNewSubtask(subtask);
     }
 
     @Test
@@ -309,5 +306,33 @@ class InMemoryTaskManagerTest {
     void changeId() {
         task1.setId(task1.getId() + 1);
         assertNotEquals(task1, taskManager.getTask(task1.getId()), "Изменение id привело к неправильной работе");
+    }
+
+    @Test
+    void loadingEmptyFile() {
+        taskManager = FileBackedTaskManager.loadFromFile(emptyFile);
+
+        assertEquals(taskManager.getTasks().size(), 0, "Пустой список задач");
+        assertEquals(taskManager.getSubTasks().size(), 0, "Пустой список задач");
+        assertEquals(taskManager.getSubTasks().size(), 0, "Пустой список задач");
+    }
+
+    @Test
+    void SaveEmptyFile() throws IOException {
+        taskManager = FileBackedTaskManager.loadFromFile(emptyFile);
+        taskManager.removeTasks();
+
+        String textFile = Files.readString(emptyFile.toPath());
+
+        assertEquals(textFile, "id,type,name,status,description,epic", "Сохранен пустой файл");
+    }
+
+    @Test
+    void SaveSeveralTasks() {
+        TaskManager newTaskManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        assertArrayEquals(taskManager.getTasks().toArray(), newTaskManager.getTasks().toArray(), "Задачи загружены");
+        assertArrayEquals(taskManager.getSubTasks().toArray(), newTaskManager.getSubTasks().toArray(), "Подзадачи загружены");
+        assertArrayEquals(taskManager.getEpics().toArray(), newTaskManager.getEpics().toArray(), "Эпики загружены");
     }
 }
