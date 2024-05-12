@@ -26,7 +26,7 @@ class FileBackedTaskManagerTest {
 
     static {
         try {
-            tempFile = File.createTempFile("resources/tempFile1", ".txt");
+            tempFile = File.createTempFile("tempFile1", ".txt");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
