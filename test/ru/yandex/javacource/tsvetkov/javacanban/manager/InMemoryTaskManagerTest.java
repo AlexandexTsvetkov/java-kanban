@@ -21,7 +21,7 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void BeforeEach() {
-        taskManager = Managers.getDefault();
+        taskManager = new InMemoryTaskManager();
 
         taskManager.removeEpics();
         taskManager.removeTasks();

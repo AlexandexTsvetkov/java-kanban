@@ -13,7 +13,7 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Поехали!");
-        File file = new File("manager.txt");
+        File file = new File("resources/ManagerMain.txt");
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
         Task runFiveRings = new Task("Пробежать 5 кругов", "Очень быстро надо пробежать");

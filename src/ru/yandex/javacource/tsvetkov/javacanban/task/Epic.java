@@ -17,16 +17,19 @@ public class Epic extends Task {
     public Epic(String name, String description) {
         super(name, description);
         this.subtasksId = new ArrayList<>();
+        this.taskType = TaskType.EPIC;
     }
 
     public Epic(String name, String description, int id, List<Integer> subtasksId) {
         super(name, description, id, Status.NEW);
         this.subtasksId = subtasksId;
+        this.taskType = TaskType.EPIC;
     }
 
     public Epic(String name, String description, int id, List<Integer> subtasksId, Status status) {
         super(name, description, id, status);
         this.subtasksId = subtasksId;
+        this.taskType = TaskType.EPIC;
     }
 
     public void addSubtaskId(int subtaskId) {

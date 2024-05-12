@@ -21,12 +21,12 @@ class FileBackedTaskManagerTest {
     static Epic epic1;
     static Subtask subtask1;
     static Task task1;
-    static File emptyFile = new File("EmptyFile.txt");
+    static File emptyFile = new File("resources/EmptyFile.txt");
     static File tempFile;
 
     static {
         try {
-            tempFile = File.createTempFile("tempFile1", ".txt");
+            tempFile = File.createTempFile("resources/tempFile1", ".txt");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

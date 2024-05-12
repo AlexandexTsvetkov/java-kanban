@@ -3,9 +3,6 @@ package ru.yandex.javacource.tsvetkov.javacanban.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ManagersTest {
@@ -15,10 +12,10 @@ class ManagersTest {
     static TaskManager fileBackedTaskManager;
 
     @BeforeEach
-    void beforeAll() throws IOException {
-        taskManager = Managers.getDefault();
+    void beforeAll() {
+        taskManager = new InMemoryTaskManager();
         historyManager = Managers.getDefaultHistory();
-        fileBackedTaskManager = FileBackedTaskManager.loadFromFile(File.createTempFile("tempFile", ".txt"));
+        fileBackedTaskManager = Managers.getDefault();
     }
 
     @Test

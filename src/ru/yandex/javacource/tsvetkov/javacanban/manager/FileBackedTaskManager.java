@@ -11,9 +11,11 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
+    private static final String HEADER = "id,type,name,status,description,epic";
+    private static final String LINE_DELIMITER = String.format("%s%s", ",", System.lineSeparator());
     private final File managerSaveFile;
 
-    private FileBackedTaskManager(File managerSaveFile) {
+    public FileBackedTaskManager(File managerSaveFile) {
         super();
         this.managerSaveFile = managerSaveFile;
     }
@@ -27,7 +29,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 Files.createFile(managerFile);
             }
             List<String> fileLines = new ArrayList<>();
-            fileLines.add("id,type,name,status,description,epic");
+            fileLines.add(HEADER);
             for (Task task : tasks.values()) {
                 fileLines.add(toString(task));
             }
@@ -37,7 +39,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Task task : subTasks.values()) {
                 fileLines.add(toString(task));
             }
-            Files.writeString(managerFile, String.join(",\n", fileLines));
+            Files.writeString(managerFile, String.join(LINE_DELIMITER, fileLines));
         } catch (IOException e) {
             throw new ManagerSaveException(e.getMessage());
         }
@@ -52,7 +54,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 String textFile = Files.readString(file.toPath());
 
                 if (!textFile.isEmpty()) {
-                    String[] taskLines = textFile.split("\n");
+                    String[] taskLines = textFile.split(System.lineSeparator());
 
                     if (taskLines.length > 1) {
                         int maxId = 0;
@@ -64,9 +66,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 int id = task.getId();
                                 maxId = Integer.max(id, maxId);
 
-                                if (task instanceof Subtask) {
+                                if (task.getTaskType() == TaskType.SUBTASK) {
                                     fileBackedTaskManager.subTasks.put(id, (Subtask) task);
-                                } else if (task instanceof Epic) {
+                                } else if (task.getTaskType() == TaskType.EPIC) {
                                     fileBackedTaskManager.epics.put(id, (Epic) task);
                                 } else {
                                     fileBackedTaskManager.tasks.put(id, task);
@@ -113,13 +115,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = task.getName();
         String status = task.getStatus().toString();
         String description = task.getDescription();
+        TaskType taskType = task.getTaskType();
 
-        if (task instanceof Subtask subtask) {
-            textTask = String.join(",", new String[]{id, TaskType.SUBTASK.toString(), name, status, description, String.valueOf(subtask.getEpicId())});
-        } else if (task instanceof Epic) {
-            textTask = String.join(",", new String[]{id, TaskType.EPIC.toString(), name, status, description});
+        if (task.getTaskType() == TaskType.SUBTASK) {
+            Subtask subtask = (Subtask) task;
+            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description, String.valueOf(subtask.getEpicId())});
         } else {
-            textTask = String.join(",", new String[]{id, TaskType.TASK.toString(), name, status, description});
+            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description});
         }
         return textTask;
     }
@@ -197,22 +199,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public void removeEpics() {
         super.removeEpics();
         save();
-    }
-
-    public static class ManagerSaveException extends RuntimeException {
-        public ManagerSaveException(final String message) {
-            super(message);
-        }
-    }
-
-    public static class ManagerReadException extends RuntimeException {
-        public ManagerReadException(final String message) {
-            super(message);
-        }
-    }
-
-    @Override
-    protected HistoryManager generateHistoryManager() {
-        return new InMemoryHistoryManager();
     }
 }
