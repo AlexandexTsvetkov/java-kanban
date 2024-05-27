@@ -1,17 +1,20 @@
 package ru.yandex.javacource.tsvetkov.javacanban;
 
-import ru.yandex.javacource.tsvetkov.javacanban.manager.Managers;
+import ru.yandex.javacource.tsvetkov.javacanban.manager.FileBackedTaskManager;
 import ru.yandex.javacource.tsvetkov.javacanban.manager.TaskManager;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Epic;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
+
+import java.io.File;
 
 public class Main {
 
     public static void main(String[] args) {
 
         System.out.println("Поехали!");
-        TaskManager taskManager = Managers.getDefault();
+        File file = new File("resources/ManagerMain.txt");
+        TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
         Task runFiveRings = new Task("Пробежать 5 кругов", "Очень быстро надо пробежать");
 
@@ -23,42 +26,24 @@ public class Main {
 
         Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", epicId);
         Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", epicId);
-        Subtask coockTea = new Subtask("Приготовить чай", "Желательно горячий", epicId);
 
         Epic loseWeight = new Epic("Похудеть", "Нужно похудеть на 10 кг");
 
-        taskManager.addNewEpic(loseWeight);
+        epicId = taskManager.addNewEpic(loseWeight);
+
+        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId);
 
         taskManager.addNewTask(runFiveRings);
         taskManager.addNewTask(eatAnApple);
         taskManager.addNewSubtask(coockFirstDish);
         taskManager.addNewSubtask(coocSecondDish);
-        taskManager.addNewSubtask(coockTea);
+        taskManager.addNewSubtask(eatLess);
 
-        taskManager.getTask(3);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.getSubTask(5);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.getEpic(1);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.getSubTask(7);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.getEpic(1);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.getTask(3);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
-        taskManager.removeTask(3);
-        System.out.println(taskManager.getHistory());
-        taskManager.removeEpic(1);
-        System.out.println(taskManager.getHistory());
-        System.out.println("/////////////////////////////");
+        printAllTasks(taskManager);
 
+        TaskManager newTaskManager = FileBackedTaskManager.loadFromFile(file);
+
+        printAllTasks(newTaskManager);
     }
 
     private static void printAllTasks(TaskManager manager) {

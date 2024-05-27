@@ -9,11 +9,13 @@ class ManagersTest {
 
     static TaskManager taskManager;
     static HistoryManager historyManager;
+    static TaskManager fileBackedTaskManager;
 
     @BeforeEach
     void beforeAll() {
-        taskManager = Managers.getDefault();
+        taskManager = new InMemoryTaskManager();
         historyManager = Managers.getDefaultHistory();
+        fileBackedTaskManager = Managers.getDefault();
     }
 
     @Test
@@ -24,5 +26,10 @@ class ManagersTest {
     @Test
     void historyManagerIsInitialized() {
         assertNotNull(historyManager);
+    }
+
+    @Test
+    void fileBackedTaskManagerIsInitialized() {
+        assertNotNull(fileBackedTaskManager);
     }
 }

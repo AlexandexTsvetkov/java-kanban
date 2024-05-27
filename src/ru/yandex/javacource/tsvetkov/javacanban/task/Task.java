@@ -5,6 +5,7 @@ public class Task {
     protected String name;
     protected String description;
     public Status status;
+    protected TaskType taskType;
 
     @Override
     public boolean equals(Object o) {
@@ -37,6 +38,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
+        this.taskType = TaskType.TASK;
     }
 
     public Task(String name, String description, int id, Status status) {
@@ -45,6 +47,7 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.taskType = TaskType.TASK;
     }
 
     public String getName() {
@@ -75,5 +78,9 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
     }
 }
