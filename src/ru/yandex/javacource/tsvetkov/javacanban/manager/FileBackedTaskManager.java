@@ -6,14 +6,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static final String HEADER = "id,type,name,status,description,epic";
+    private static final String HEADER = "id,type,name,status,description,startdate,duration,epic";
     private static final String LINE_DELIMITER = String.format("%s%s", ",", System.lineSeparator());
     private final File managerSaveFile;
+    protected static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     public FileBackedTaskManager(File managerSaveFile) {
         super();
@@ -47,10 +51,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
 
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+        try {
+            FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
-        if (file.exists()) {
-            try {
+            if (file.exists()) {
+
                 String textFile = Files.readString(file.toPath());
 
                 if (!textFile.isEmpty()) {
@@ -73,6 +78,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 } else {
                                     fileBackedTaskManager.tasks.put(id, task);
                                 }
+
+                                LocalDateTime startTime = task.getStartTime();
+                                if (!LocalDateTime.MIN.isEqual(startTime)) {
+                                    fileBackedTaskManager.prioritizedTasks.add(task);
+                                }
                             }
                         }
                         fileBackedTaskManager.idCounter = maxId;
@@ -82,12 +92,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         }
                     }
                 }
-            } catch (IOException e) {
-                throw new ManagerReadException(e.getMessage());
             }
+            return fileBackedTaskManager;
+        } catch (IOException | UnsupportedOperationException | ArrayIndexOutOfBoundsException e) {
+            throw new ManagerReadException(e.getMessage());
         }
-
-        return fileBackedTaskManager;
     }
 
     private static Task fromString(String textTask) {
@@ -98,13 +107,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String discription = taskFields[4].trim();
         String name = taskFields[2].trim();
         Status status = Status.valueOf(taskFields[3].trim().toUpperCase());
+        LocalDateTime startDate = LocalDateTime.parse(taskFields[5].trim(), FORMATTER);
+        Duration duration = Duration.ofMinutes(Integer.parseInt(taskFields[6].trim()));
 
         if (taskType == TaskType.TASK) {
-            task = new Task(name, discription, id, status);
+            task = new Task(name, discription, id, status, startDate, duration);
         } else if (taskType == TaskType.EPIC) {
-            task = new Epic(name, discription, id, new ArrayList<>(), status);
+            task = new Epic(name, discription, id, new ArrayList<>(), status, startDate, duration);
         } else if (taskType == TaskType.SUBTASK) {
-            task = new Subtask(name, discription, id, status, Integer.parseInt(taskFields[5].trim()));
+            task = new Subtask(name, discription, id, status, Integer.parseInt(taskFields[7].trim()), startDate, duration);
         }
         return task;
     }
@@ -116,12 +127,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String status = task.getStatus().toString();
         String description = task.getDescription();
         TaskType taskType = task.getTaskType();
+        String startDate = task.getStartTime().format(FORMATTER);
+        String minutes = String.valueOf(task.getDuration().toMinutes());
 
         if (task.getTaskType() == TaskType.SUBTASK) {
             Subtask subtask = (Subtask) task;
-            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description, String.valueOf(subtask.getEpicId())});
+            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description, startDate, minutes, String.valueOf(subtask.getEpicId())});
         } else {
-            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description});
+            textTask = String.join(",", new String[]{id, taskType.toString(), name, status, description, startDate, minutes});
         }
         return textTask;
     }
