@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
 
-    static File emptyFile = new File("resources/EmptyFile.txt");
+    static File emptyFile = new File("resources/EmptyFile.csv");
     static File tempFile;
 
     @BeforeEach
@@ -80,7 +80,7 @@ class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     }
 
     @Test
-    public void testException() {
-        assertThrows(ManagerReadException.class, () -> taskManager = FileBackedTaskManager.loadFromFile(new File("resources/ExeptionFile.txt")), "Загрузка из несуществующего файла");
+    public void testExceptionFile() {
+        assertThrows(ManagerReadException.class, () -> taskManager = FileBackedTaskManager.loadFromFile(new File("resources/ExeptionFile.csv")), "Загрузка из несуществующего файла");
     }
 }

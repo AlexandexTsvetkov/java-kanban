@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) {
 
         System.out.println("Поехали!");
-        File file = new File("resources/ManagerMain.txt");
+        File file = new File("resources/ManagerMain.csv");
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
         Task runFiveRings = new Task("Пробежать 5 кругов", "Очень быстро надо пробежать", LocalDateTime.of(2024, 1, 1, 0, 0), Duration.ofDays(1));
@@ -33,7 +33,7 @@ public class Main {
 
         epicId = taskManager.addNewEpic(loseWeight);
 
-        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId, LocalDateTime.of(2024, 1, 5, 1, 1), Duration.ofDays(1));
+        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId, LocalDateTime.of(2024, 1, 5, 0, 0), Duration.ofDays(1));
 
         taskManager.addNewTask(runFiveRings);
         taskManager.addNewTask(eatAnApple);

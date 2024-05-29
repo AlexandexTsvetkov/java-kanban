@@ -16,8 +16,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String HEADER = "id,type,name,status,description,startdate,duration,epic";
     private static final String LINE_DELIMITER = String.format("%s%s", ",", System.lineSeparator());
-    private final File managerSaveFile;
     protected static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    private final File managerSaveFile;
 
     public FileBackedTaskManager(File managerSaveFile) {
         super();
@@ -90,11 +90,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         for (Subtask subtask : fileBackedTaskManager.subTasks.values()) {
                             fileBackedTaskManager.epics.get(subtask.getEpicId()).addSubtaskId(subtask.getId());
                         }
+
+                        for (Subtask subtask : fileBackedTaskManager.subTasks.values()) {
+                            fileBackedTaskManager.updateSubtask(subtask);
+                        }
+
+                        for (Task task : fileBackedTaskManager.tasks.values()) {
+                            fileBackedTaskManager.updateTask(task);
+                        }
                     }
                 }
             }
             return fileBackedTaskManager;
-        } catch (IOException | UnsupportedOperationException | ArrayIndexOutOfBoundsException e) {
+        } catch (IOException
+                 | UnsupportedOperationException
+                 | ArrayIndexOutOfBoundsException
+                 | TaskValidationException e) {
             throw new ManagerReadException(e.getMessage());
         }
     }
@@ -108,6 +119,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = taskFields[2].trim();
         Status status = Status.valueOf(taskFields[3].trim().toUpperCase());
         LocalDateTime startDate = LocalDateTime.parse(taskFields[5].trim(), FORMATTER);
+
+        if (startDate.isEqual(LocalDateTime.of(0, 1, 1, 0, 0))) {
+            startDate = LocalDateTime.MIN;
+        }
+
         Duration duration = Duration.ofMinutes(Integer.parseInt(taskFields[6].trim()));
 
         if (taskType == TaskType.TASK) {
@@ -127,8 +143,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String status = task.getStatus().toString();
         String description = task.getDescription();
         TaskType taskType = task.getTaskType();
-        String startDate = task.getStartTime().format(FORMATTER);
-        String minutes = String.valueOf(task.getDuration().toMinutes());
+
+        LocalDateTime taskStartTime = task.getStartTime();
+
+        String minutes;
+        String startDate;
+
+        if (taskStartTime == LocalDateTime.MIN) {
+            minutes = "0";
+            startDate = LocalDateTime.of(0, 1, 1, 0, 0).format(FORMATTER);
+        } else {
+            minutes = String.valueOf(task.getDuration().toMinutes());
+            startDate = task.getStartTime().format(FORMATTER);
+        }
 
         if (task.getTaskType() == TaskType.SUBTASK) {
             Subtask subtask = (Subtask) task;

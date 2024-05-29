@@ -5,7 +5,6 @@ import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TaskManager {
     int generateId();
@@ -42,15 +41,14 @@ public interface TaskManager {
 
     void removeEpics();
 
-    Optional<Task> getTask(int id);
+    Task getTask(int id);
 
-    Optional<Subtask> getSubTask(int id);
+    Subtask getSubTask(int id);
 
-    Optional<Epic> getEpic(int id);
+    Epic getEpic(int id);
 
     List<Task> getHistory();
 
     List<Task> getPrioritizedTasks();
 
-    boolean taskIsValid(Task task);
 }
