@@ -1,11 +1,16 @@
 package ru.yandex.javacource.tsvetkov.javacanban.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Task {
     protected int id;
     protected String name;
     protected String description;
     public Status status;
     protected TaskType taskType;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     @Override
     public boolean equals(Object o) {
@@ -33,21 +38,25 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description) {
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
 
         this.name = name;
         this.description = description;
         this.status = Status.NEW;
         this.taskType = TaskType.TASK;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
-    public Task(String name, String description, int id, Status status) {
+    public Task(String name, String description, int id, Status status, LocalDateTime startTime, Duration duration) {
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
         this.taskType = TaskType.TASK;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -82,5 +91,25 @@ public class Task {
 
     public TaskType getTaskType() {
         return taskType;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plusMinutes(duration.toMinutes());
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 }

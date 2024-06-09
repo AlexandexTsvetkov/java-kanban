@@ -1,10 +1,13 @@
 package ru.yandex.javacource.tsvetkov.javacanban.task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private List<Integer> subtasksId;
+    private LocalDateTime endTime;
 
     public void removeSubtasks() {
         subtasksId.clear();
@@ -15,21 +18,22 @@ public class Epic extends Task {
     }
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, LocalDateTime.MIN, Duration.ofMinutes(0));
         this.subtasksId = new ArrayList<>();
         this.taskType = TaskType.EPIC;
     }
 
     public Epic(String name, String description, int id, List<Integer> subtasksId) {
-        super(name, description, id, Status.NEW);
+        super(name, description, id, Status.NEW, LocalDateTime.MIN, Duration.ofMinutes(0));
         this.subtasksId = subtasksId;
         this.taskType = TaskType.EPIC;
     }
 
-    public Epic(String name, String description, int id, List<Integer> subtasksId, Status status) {
-        super(name, description, id, status);
+    public Epic(String name, String description, int id, List<Integer> subtasksId, Status status, LocalDateTime startTime, Duration duration) {
+        super(name, description, id, status, startTime, duration);
         this.subtasksId = subtasksId;
         this.taskType = TaskType.EPIC;
+        this.endTime = startTime.plusMinutes(duration.toMinutes());
     }
 
     public void addSubtaskId(int subtaskId) {
@@ -73,5 +77,14 @@ public class Epic extends Task {
 
     public void setSubtasksId(List<Integer> subtasksId) {
         this.subtasksId = subtasksId;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }

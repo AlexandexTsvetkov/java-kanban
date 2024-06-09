@@ -7,31 +7,33 @@ import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
 import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
 
     public static void main(String[] args) {
 
         System.out.println("Поехали!");
-        File file = new File("resources/ManagerMain.txt");
+        File file = new File("resources/ManagerMain.csv");
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(file);
 
-        Task runFiveRings = new Task("Пробежать 5 кругов", "Очень быстро надо пробежать");
+        Task runFiveRings = new Task("Пробежать 5 кругов", "Очень быстро надо пробежать", LocalDateTime.of(2024, 1, 1, 0, 0), Duration.ofDays(1));
 
-        Task eatAnApple = new Task("Съесть яблоко", "Съесть нужно целиком");
+        Task eatAnApple = new Task("Съесть яблоко", "Съесть нужно целиком", LocalDateTime.of(2024, 1, 2, 0, 0), Duration.ofDays(1));
 
         Epic coockLunch = new Epic("Приготовить обед", "Должно быть вкусно");
 
         int epicId = taskManager.addNewEpic(coockLunch);
 
-        Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", epicId);
-        Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", epicId);
+        Subtask coockFirstDish = new Subtask("Приготовить первое блюдо", "Желательно суп", epicId, LocalDateTime.of(2024, 1, 3, 0, 0), Duration.ofDays(1));
+        Subtask coocSecondDish = new Subtask("Приготовить второе блюдо", "Желательно макароны", epicId, LocalDateTime.of(2024, 1, 4, 0, 0), Duration.ofDays(1));
 
         Epic loseWeight = new Epic("Похудеть", "Нужно похудеть на 10 кг");
 
         epicId = taskManager.addNewEpic(loseWeight);
 
-        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId);
+        Subtask eatLess = new Subtask("Есть меньше", "Можно есть овощи", epicId, LocalDateTime.of(2024, 1, 5, 0, 0), Duration.ofDays(1));
 
         taskManager.addNewTask(runFiveRings);
         taskManager.addNewTask(eatAnApple);
