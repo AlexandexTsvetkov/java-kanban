@@ -18,15 +18,17 @@ public class Epic extends Task {
     }
 
     public Epic(String name, String description) {
-        super(name, description, LocalDateTime.MIN, Duration.ofMinutes(0));
+        super(name, description, LocalDateTime.of(0, 1, 1, 0, 0), Duration.ofMinutes(0));
         this.subtasksId = new ArrayList<>();
         this.taskType = TaskType.EPIC;
+        this.endTime = LocalDateTime.of(0, 1, 1, 0, 0);
     }
 
     public Epic(String name, String description, int id, List<Integer> subtasksId) {
-        super(name, description, id, Status.NEW, LocalDateTime.MIN, Duration.ofMinutes(0));
+        super(name, description, id, Status.NEW, LocalDateTime.of(0, 1, 1, 0, 0), Duration.ofMinutes(0));
         this.subtasksId = subtasksId;
         this.taskType = TaskType.EPIC;
+        this.endTime = LocalDateTime.of(0, 1, 1, 0, 0);
     }
 
     public Epic(String name, String description, int id, List<Integer> subtasksId, Status status, LocalDateTime startTime, Duration duration) {
@@ -66,12 +68,16 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.javacource.tsvetkov.javacanban.task.Epic{" +
+        return "Epic{" +
                 "subtasksId=" + subtasksId +
+                ", endTime=" + endTime +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", taskType=" + taskType +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 

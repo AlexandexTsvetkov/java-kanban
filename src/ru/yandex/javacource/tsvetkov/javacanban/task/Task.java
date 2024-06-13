@@ -77,11 +77,14 @@ public class Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.javacource.tsvetkov.javacanban.task.Task{" +
+        return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", taskType=" + taskType +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 
@@ -111,5 +114,9 @@ public class Task {
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 }

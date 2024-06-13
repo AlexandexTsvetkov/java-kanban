@@ -18,6 +18,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest {
 
     @BeforeEach
     void BeforeEach() {
+
         taskManager = new InMemoryTaskManager();
 
         taskManager.removeEpics();
@@ -147,6 +148,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest {
     @Override
     @Test
     void historymanagerSavesPreviousVersionOfSubtask() {
+
         Subtask historySubtask = taskManager.getSubTask(subtask1.getId());
 
         Subtask newSubtask = new Subtask("New name", "New description", subtask1.getId(), Status.DONE, epic1.getId(), LocalDateTime.of(2024, 1, 8, 0, 0), Duration.ofDays(1));
@@ -345,7 +347,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest {
     @Test
     void changeId() {
         task1.setId(task1.getId() + 1);
-        assertNotEquals(task1, taskManager.getTask(task1.getId()), "Изменение id привело к неправильной работе");
+        assertThrows(NotFoundExeption.class, () -> taskManager.getTask(task1.getId()), "Получение несуществующей задачи");
     }
 
     @Override
