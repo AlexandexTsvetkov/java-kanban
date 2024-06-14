@@ -80,7 +80,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 }
 
                                 LocalDateTime startTime = task.getStartTime();
-                                if (!LocalDateTime.MIN.isEqual(startTime)) {
+                                if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(startTime)) {
                                     fileBackedTaskManager.prioritizedTasks.add(task);
                                 }
                             }
@@ -121,7 +121,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         LocalDateTime startDate = LocalDateTime.parse(taskFields[5].trim(), FORMATTER);
 
         if (startDate.isEqual(LocalDateTime.of(0, 1, 1, 0, 0))) {
-            startDate = LocalDateTime.MIN;
+            startDate = LocalDateTime.of(0, 1, 1, 0, 0);
         }
 
         Duration duration = Duration.ofMinutes(Integer.parseInt(taskFields[6].trim()));
@@ -149,7 +149,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String minutes;
         String startDate;
 
-        if (taskStartTime == LocalDateTime.MIN) {
+        if (taskStartTime.equals(LocalDateTime.of(0, 1, 1, 0, 0))) {
             minutes = "0";
             startDate = LocalDateTime.of(0, 1, 1, 0, 0).format(FORMATTER);
         } else {

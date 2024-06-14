@@ -24,12 +24,15 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "ru.yandex.javacource.tsvetkov.javacanban.task.Subtask{" +
+        return "Subtask{" +
                 "epicId=" + epicId +
                 ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", taskType=" + taskType +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 }

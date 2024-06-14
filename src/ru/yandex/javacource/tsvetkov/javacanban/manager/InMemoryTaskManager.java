@@ -1,9 +1,6 @@
 package ru.yandex.javacource.tsvetkov.javacanban.manager;
 
-import ru.yandex.javacource.tsvetkov.javacanban.task.Epic;
-import ru.yandex.javacource.tsvetkov.javacanban.task.Status;
-import ru.yandex.javacource.tsvetkov.javacanban.task.Subtask;
-import ru.yandex.javacource.tsvetkov.javacanban.task.Task;
+import ru.yandex.javacource.tsvetkov.javacanban.task.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -48,11 +45,24 @@ public class InMemoryTaskManager implements TaskManager {
         final int id = generateId();
         task.setId(id);
 
-        if (!LocalDateTime.MIN.isEqual(task.getStartTime()) && task.getStartTime() != null) {
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(task.getStartTime()) && task.getStartTime() != null) {
 
             if (taskIsInvalid(task)) {
                 throw new TaskValidationException("В этом периоде уже запланированы задачи");
             }
+        }
+
+        if (task.getStartTime() == null) {
+            task.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            task.setDuration(Duration.ofMinutes(0));
+        }
+
+        if (task.getStatus() == null) {
+            task.setStatus(Status.NEW);
+        }
+
+        if (task.getTaskType() == null) {
+            task.setTaskType(TaskType.TASK);
         }
 
         tasks.put(id, task);
@@ -66,6 +76,20 @@ public class InMemoryTaskManager implements TaskManager {
     public int addNewEpic(Epic epic) {
         final int id = generateId();
         epic.setId(id);
+
+        if (epic.getStartTime() == null) {
+            epic.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            epic.setDuration(Duration.ofMinutes(0));
+        }
+
+        if (epic.getStatus() == null) {
+            epic.setStatus(Status.NEW);
+        }
+
+        if (epic.getTaskType() == null) {
+            epic.setTaskType(TaskType.EPIC);
+        }
+
         epics.put(id, epic);
 
         return id;
@@ -78,14 +102,27 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(epicId);
 
         if (epic == null) {
-            return null;
+            throw new NotFoundExeption("Эпик по id = " + epicId + "не найден");
         }
 
-        if (!LocalDateTime.MIN.isEqual(subTask.getStartTime()) && subTask.getStartTime() != null) {
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subTask.getStartTime()) && subTask.getStartTime() != null) {
 
             if (taskIsInvalid(subTask)) {
                 throw new TaskValidationException("В этом периоде уже запланированы задачи");
             }
+        }
+
+        if (subTask.getStartTime() == null) {
+            subTask.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            subTask.setDuration(Duration.ofMinutes(0));
+        }
+
+        if (subTask.getStatus() == null) {
+            subTask.setStatus(Status.NEW);
+        }
+
+        if (subTask.getTaskType() == null) {
+            subTask.setTaskType(TaskType.SUBTASK);
         }
 
         final int id = generateId();
@@ -102,10 +139,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTask(int id) {
+
         Task task = tasks.get(id);
+
+        if (task == null) {
+            throw new NotFoundExeption("Задача по id = " + id + "не найдена");
+        }
+
         prioritizedTasks.remove(task);
 
-        if (!LocalDateTime.MIN.isEqual(task.getStartTime()) && task.getStartTime() != null) {
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(task.getStartTime()) && task.getStartTime() != null) {
             removeTaskFromCalendar(task);
         }
         tasks.remove(id);
@@ -118,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epicToRemove = epics.remove(id);
 
         if (epicToRemove == null) {
-            return;
+            throw new NotFoundExeption("Эпик по id = " + id + "не найден");
         }
 
         List<Integer> subtasksId = epicToRemove.getSubtasksId();
@@ -126,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
             Subtask subtask = subTasks.get(idOfSubtask);
             prioritizedTasks.remove(subtask);
 
-            if (!LocalDateTime.MIN.isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
+            if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
                 removeTaskFromCalendar(subtask);
             }
 
@@ -142,11 +185,11 @@ public class InMemoryTaskManager implements TaskManager {
 
         Subtask subtask = subTasks.remove(id);
         if (subtask == null) {
-            return;
+            throw new NotFoundExeption("Подзадача по id = " + id + "не найдена");
         }
         prioritizedTasks.remove(subtask);
 
-        if (!LocalDateTime.MIN.isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
             removeTaskFromCalendar(subtask);
         }
 
@@ -163,14 +206,38 @@ public class InMemoryTaskManager implements TaskManager {
         Task savedTask = tasks.get(id);
 
         if (savedTask == null) {
-            return;
+            throw new NotFoundExeption("Задача с id = " + id + " не найдена");
         }
 
-        if (!LocalDateTime.MIN.isEqual(task.getStartTime()) && task.getStartTime() != null) {
+        boolean calendarCleaned = false;
+
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(savedTask.getStartTime()) && savedTask.getStartTime() != null) {
+            removeTaskFromCalendar(savedTask);
+            calendarCleaned = true;
+        }
+
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(task.getStartTime()) && task.getStartTime() != null) {
 
             if (taskIsInvalid(task)) {
+
+                if (calendarCleaned) {
+                    addTaskToCalendar(savedTask);
+                }
                 throw new TaskValidationException("В этом периоде уже запланированы задачи");
             }
+        }
+
+        if (task.getStartTime() == null) {
+            task.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            task.setDuration(Duration.ofMinutes(0));
+        }
+
+        if (task.getStatus() == null) {
+            task.setStatus(Status.NEW);
+        }
+
+        if (task.getTaskType() == null) {
+            task.setTaskType(TaskType.TASK);
         }
 
         tasks.put(id, task);
@@ -186,7 +253,14 @@ public class InMemoryTaskManager implements TaskManager {
         Subtask savedSubtask = subTasks.get(id);
 
         if (savedSubtask == null) {
-            return;
+            throw new NotFoundExeption("Подзадача с id = " + id + " не найдена");
+        }
+
+        boolean calendarCleaned = false;
+
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(savedSubtask.getStartTime()) && savedSubtask.getStartTime() != null) {
+            removeTaskFromCalendar(savedSubtask);
+            calendarCleaned = true;
         }
 
         Epic epic = epics.get(epicId);
@@ -195,11 +269,28 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        if (!LocalDateTime.MIN.isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
+        if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
 
             if (taskIsInvalid(subtask)) {
+
+                if (calendarCleaned) {
+                    addTaskToCalendar(savedSubtask);
+                }
                 throw new TaskValidationException("В этом периоде уже запланированы задачи");
             }
+        }
+
+        if (subtask.getStartTime() == null) {
+            subtask.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            subtask.setDuration(Duration.ofMinutes(0));
+        }
+
+        if (subtask.getStatus() == null) {
+            subtask.setStatus(Status.NEW);
+        }
+
+        if (subtask.getTaskType() == null) {
+            subtask.setTaskType(TaskType.SUBTASK);
         }
 
         subTasks.put(id, subtask);
@@ -216,7 +307,7 @@ public class InMemoryTaskManager implements TaskManager {
         final Epic savedEpic = epics.get(epic.getId());
 
         if (savedEpic == null) {
-            return;
+            throw new NotFoundExeption("Эпик с id = " + epic.getId() + " не найден");
         }
         epic.setSubtasksId(savedEpic.getSubtasksId());
         epic.setStatus(savedEpic.getStatus());
@@ -241,6 +332,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getSubTasksOfEpic(int epicId) {
 
+        if (epics.get(epicId) == null) {
+            throw new NotFoundExeption("Эпик не найден по id = " + epicId);
+        }
+
         return subTasks.values().stream()
                 .filter(element -> element.getEpicId() == epicId)
                 .collect(Collectors.toList());
@@ -254,7 +349,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Task task : removedTasks) {
             prioritizedTasks.remove(task);
 
-            if (!LocalDateTime.MIN.isEqual(task.getStartTime()) && task.getStartTime() != null) {
+            if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(task.getStartTime()) && task.getStartTime() != null) {
                 removeTaskFromCalendar(task);
             }
             historyManager.remove(task.getId());
@@ -278,7 +373,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(subtask.getId());
             prioritizedTasks.remove(subtask);
 
-            if (!LocalDateTime.MIN.isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
+            if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
                 removeTaskFromCalendar(subtask);
             }
         }
@@ -301,72 +396,110 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(subtask.getId());
             prioritizedTasks.remove(subtask);
 
-            if (!LocalDateTime.MIN.isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
+            if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(subtask.getStartTime()) && subtask.getStartTime() != null) {
                 removeTaskFromCalendar(subtask);
             }
         }
     }
 
     @Override
-    public Task getTask(int id) {
+    public Task getTask(int id) throws NotFoundExeption {
+
         final Task task = tasks.get(id);
+
+        if (task == null) {
+            throw new NotFoundExeption("Задача по id = " + id + "не найдена");
+        }
+
         historyManager.add(task);
         return task;
     }
 
     @Override
-    public Subtask getSubTask(int id) {
+    public Subtask getSubTask(int id) throws NotFoundExeption {
+
         final Subtask subtask = subTasks.get(id);
+
+        if (subtask == null) {
+            throw new NotFoundExeption("Подзадача по id = " + id + "не найдена");
+        }
+
         historyManager.add(subtask);
         return subtask;
     }
 
     @Override
-    public Epic getEpic(int id) {
+    public Epic getEpic(int id) throws NotFoundExeption {
+
         final Epic epic = epics.get(id);
+
+        if (epic == null) {
+            throw new NotFoundExeption("Эпик по id = " + id + "не найден");
+        }
+
         historyManager.add(epic);
         return epic;
     }
 
     private void updateEpicCondition(Epic epic) {
 
+        updateEpicStatus(epic);
+        updateEpicDates(epic);
+    }
+
+    private void updateEpicStatus(Epic epic) {
+
         List<Integer> subtasksId = epic.getSubtasksId();
 
         if (subtasksId.isEmpty()) {
-            epic.setStartTime(LocalDateTime.MIN);
-            epic.setDuration(Duration.ofMinutes(0));
-            epic.setEndTime(LocalDateTime.MIN);
             epic.status = Status.NEW;
         } else {
 
-            LocalDateTime dateStartOfEpic = LocalDateTime.MAX;
-            LocalDateTime dateEndtOfEpic = LocalDateTime.MIN;
             Status statusOfEpic = subTasks.get(subtasksId.getFirst()).getStatus();
+
+            for (int subtaskId : subtasksId) {
+
+                if (subTasks.get(subtaskId).getStatus() != statusOfEpic) {
+                    epic.status = Status.IN_PROGRESS;
+                    return;
+                }
+            }
+            epic.status = statusOfEpic;
+        }
+    }
+
+    private void updateEpicDates(Epic epic) {
+
+        List<Integer> subtasksId = epic.getSubtasksId();
+
+        if (subtasksId.isEmpty()) {
+            epic.setStartTime(LocalDateTime.of(0, 1, 1, 0, 0));
+            epic.setDuration(Duration.ofMinutes(0));
+            epic.setEndTime(LocalDateTime.of(0, 1, 1, 0, 0));
+        } else {
+
+            LocalDateTime dateStartOfEpic = LocalDateTime.MAX;
+            LocalDateTime dateEndtOfEpic = LocalDateTime.of(0, 1, 1, 0, 0);
 
             for (int subtaskId : subtasksId) {
 
                 LocalDateTime dateStartOfSubtask = subTasks.get(subtaskId).getStartTime();
 
-                if (statusOfEpic != Status.IN_PROGRESS && subTasks.get(subtaskId).getStatus() != statusOfEpic) {
-                    statusOfEpic = Status.IN_PROGRESS;
-                }
 
-                if (!LocalDateTime.MIN.isEqual(dateStartOfSubtask) && dateStartOfEpic.isAfter(dateStartOfSubtask)) {
+                if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(dateStartOfSubtask) && dateStartOfEpic.isAfter(dateStartOfSubtask)) {
                     dateStartOfEpic = dateStartOfSubtask;
                 }
 
                 LocalDateTime dateEndOfSubtask = subTasks.get(subtaskId).getEndTime();
 
-                if (!LocalDateTime.MIN.isEqual(dateEndOfSubtask) && dateEndtOfEpic.isBefore(dateEndOfSubtask)) {
+                if (!LocalDateTime.of(0, 1, 1, 0, 0).isEqual(dateEndOfSubtask) && dateEndtOfEpic.isBefore(dateEndOfSubtask)) {
                     dateEndtOfEpic = dateEndOfSubtask;
                 }
             }
 
             if (LocalDateTime.MAX.isEqual(dateEndtOfEpic)) {
-                dateEndtOfEpic = LocalDateTime.MIN;
+                dateEndtOfEpic = LocalDateTime.of(0, 1, 1, 0, 0);
             }
-
-            epic.setStatus(statusOfEpic);
 
             epic.setStartTime(dateStartOfEpic);
             epic.setEndTime(dateEndtOfEpic);
@@ -403,7 +536,10 @@ public class InMemoryTaskManager implements TaskManager {
     private boolean taskIsInvalid(Task task) {
 
         LocalDateTime startTimeInCalendar = roundToRight(task.getStartTime());
-        LocalDateTime endTimeInCalendar = roundToLeft(task.getEndTime());
+        LocalDateTime resultEndTimeInCalendar = roundToLeft(task.getEndTime());
+
+        LocalDateTime endTimeInCalendar = (resultEndTimeInCalendar.isBefore(startTimeInCalendar))
+                ? startTimeInCalendar : resultEndTimeInCalendar;
 
         return taskCalendar.keySet().stream()
                 .filter(element -> (element.isAfter(startTimeInCalendar)
@@ -455,6 +591,10 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime startTimeInCalendar = roundToRight(task.getStartTime());
         LocalDateTime endTimeInCalendar = roundToLeft(task.getEndTime());
 
+        if (endTimeInCalendar.isBefore(startTimeInCalendar)) {
+            endTimeInCalendar = startTimeInCalendar;
+        }
+
         while (startTimeInCalendar.isBefore(endTimeInCalendar) || startTimeInCalendar.isEqual(endTimeInCalendar)) {
             taskCalendar.put(startTimeInCalendar, false);
             startTimeInCalendar = startTimeInCalendar.plusMinutes(15);
@@ -465,6 +605,10 @@ public class InMemoryTaskManager implements TaskManager {
 
         LocalDateTime startTimeInCalendar = roundToRight(task.getStartTime());
         LocalDateTime endTimeInCalendar = roundToLeft(task.getEndTime());
+
+        if (endTimeInCalendar.isBefore(startTimeInCalendar)) {
+            endTimeInCalendar = startTimeInCalendar;
+        }
 
         while (startTimeInCalendar.isBefore(endTimeInCalendar) || startTimeInCalendar.isEqual(endTimeInCalendar)) {
             taskCalendar.put(startTimeInCalendar, true);
